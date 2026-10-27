@@ -10,6 +10,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
 using Avalonia.Platform;
+using Avalonia.Styling;
 using Avalonia.Themes.Fluent;
 
 namespace Journal;
@@ -68,6 +69,50 @@ public class App : Application
         // gives every control its normal border, focus and watermark look;
         // CaptureWindow also sets all of its own colours explicitly now.
         Styles.Add(new FluentTheme());
+        // BUG FIX (2026-10-27, theme consistency): the Fluent theme follows
+        // Windows dark mode by default, while every window hard-codes a
+        // light paper background (#FDF8F0). On a dark-mode PC that left
+        // white theme text on light paper (invisible labels/buttons) and
+        // a dark focused TextBox with dark ink text (black while typing).
+        // Force light for the whole app, regardless of Windows settings.
+        RequestedThemeVariant = Avalonia.Styling.ThemeVariant.Light;
+        // Global light fallbacks: no TextBlock / Button / CheckBox /
+        // TextBox anywhere may rely on an inherited theme foreground.
+        // Local values set on a control (e.g. teal buttons with white
+        // text) still win over these style setters, by Avalonia precedence.
+        var ink = new SolidColorBrush(Color.Parse("#1F2937"));
+        var white = new SolidColorBrush(Color.Parse("#FFFFFF"));
+        var border = new SolidColorBrush(Color.Parse("#D1D5DB"));
+        var tealTint = new SolidColorBrush(Color.Parse("#CCFBF1"));
+        Styles.Add(new Avalonia.Styling.Style(x => x.OfType<TextBlock>())
+        {
+            Setters = { new Avalonia.Styling.Setter(TextBlock.ForegroundProperty, ink) }
+        });
+        Styles.Add(new Avalonia.Styling.Style(x => x.OfType<Button>())
+        {
+            Setters =
+            {
+                new Avalonia.Styling.Setter(Button.ForegroundProperty, ink),
+                new Avalonia.Styling.Setter(Button.BackgroundProperty, white),
+                new Avalonia.Styling.Setter(Button.BorderBrushProperty, border),
+            }
+        });
+        Styles.Add(new Avalonia.Styling.Style(x => x.OfType<CheckBox>())
+        {
+            Setters = { new Avalonia.Styling.Setter(CheckBox.ForegroundProperty, ink) }
+        });
+        Styles.Add(new Avalonia.Styling.Style(x => x.OfType<TextBox>())
+        {
+            Setters =
+            {
+                new Avalonia.Styling.Setter(TextBox.BackgroundProperty, white),
+                new Avalonia.Styling.Setter(TextBox.ForegroundProperty, ink),
+                new Avalonia.Styling.Setter(TextBox.BorderBrushProperty, border),
+                new Avalonia.Styling.Setter(TextBox.CaretBrushProperty, ink),
+                new Avalonia.Styling.Setter(TextBox.SelectionBrushProperty, tealTint),
+                new Avalonia.Styling.Setter(TextBox.SelectionForegroundBrushProperty, ink),
+            }
+        });
     }
 
     public override void OnFrameworkInitializationCompleted()

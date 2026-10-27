@@ -28,30 +28,30 @@ public class SettingsWindow : Window
             Text = "Settings", FontSize = 18, FontWeight = FontWeight.SemiBold,
             Foreground = new SolidColorBrush(Color.Parse("#1F2937"))
         });
-        stack.Children.Add(new TextBlock { Text = "Notion — enter your own token and database ID. Nothing is hard-coded in the app.", FontSize = 12, TextWrapping = TextWrapping.Wrap });
-        stack.Children.Add(new TextBlock { Text = "Notion token (stored with Windows DPAPI, never in plain text)" });
+        stack.Children.Add(new TextBlock { Text = "Notion — enter your own token and database ID. Nothing is hard-coded in the app.", FontSize = 12, TextWrapping = TextWrapping.Wrap, Foreground = Ui.InkBrush });
+        stack.Children.Add(new TextBlock { Text = "Notion token (stored with Windows DPAPI, never in plain text)", Foreground = Ui.InkBrush });
         _tokenBox = Ui.TextBox(40);
         _tokenBox.PasswordChar = '\u2022';
         stack.Children.Add(_tokenBox);
-        stack.Children.Add(new TextBlock { Text = "Notion database ID" });
+        stack.Children.Add(new TextBlock { Text = "Notion database ID", Foreground = Ui.InkBrush });
         _dbBox = Ui.TextBox(40);
         _dbBox.Text = s.DatabaseId;
         stack.Children.Add(_dbBox);
-        stack.Children.Add(new TextBlock { Text = "Shortcuts — press Change is not needed here; type a new combination, e.g. Ctrl+Alt+Q" });
-        stack.Children.Add(new TextBlock { Text = "Open capture" });
+        stack.Children.Add(new TextBlock { Text = "Shortcuts — type a new combination, e.g. Ctrl+Alt+Q", Foreground = Ui.InkBrush });
+        stack.Children.Add(new TextBlock { Text = "Open capture", Foreground = Ui.InkBrush });
         _captureBox = Ui.TextBox(40);
         _captureBox.Text = s.CaptureShortcut;
         stack.Children.Add(_captureBox);
-        stack.Children.Add(new TextBlock { Text = "Open evening review" });
+        stack.Children.Add(new TextBlock { Text = "Open evening review", Foreground = Ui.InkBrush });
         _eveningBox = Ui.TextBox(40);
         _eveningBox.Text = s.EveningShortcut;
         stack.Children.Add(_eveningBox);
-        _updatesBox = new CheckBox { Content = "Check for updates on startup (GitHub Releases, stable only, ask first)", IsChecked = s.CheckForUpdates };
+        _updatesBox = new CheckBox { Content = "Check for updates on startup (GitHub Releases, stable only, ask first)", IsChecked = s.CheckForUpdates, Foreground = Ui.InkBrush };
         stack.Children.Add(_updatesBox);
         var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 12 };
         // Both buttons pin their own height and Top alignment so neither
         // stretches to fill the row (the reported "Save settings" sizing bug).
-        var test = new Button { Content = "Test Notion connection", Width = 200, Height = 44, VerticalAlignment = VerticalAlignment.Top };
+        var test = new Button { Content = "Test Notion connection", Width = 200, Height = 44, VerticalAlignment = VerticalAlignment.Top, Background = Ui.WhiteBrush, Foreground = Ui.InkBrush, BorderBrush = Ui.BorderBrush, BorderThickness = new Avalonia.Thickness(1.5) };
         test.Click += async (_, _) => await TestAsync();
         var save = new Button
         {

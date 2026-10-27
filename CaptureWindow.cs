@@ -85,7 +85,7 @@ public class CaptureWindow : Window
         bottom.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Star));
         bottom.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
         bottom.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
-        var plus = new Button { Content = "+", Width = 40, Height = 40, CornerRadius = new CornerRadius(10) };
+        var plus = new Button { Content = "+", Width = 40, Height = 40, CornerRadius = new CornerRadius(10), Background = Ui.WhiteBrush, Foreground = Ui.InkBrush, BorderBrush = Ui.BorderBrush, BorderThickness = new Thickness(1.5) };
         plus.Click += (_, _) =>
         {
             var w = new TagsWindow(_tags, RefreshTags);
@@ -103,7 +103,7 @@ public class CaptureWindow : Window
             Foreground = new SolidColorBrush(Color.Parse("#6B7280")),
             VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(12, 0, 0, 0)
         };
-        var settingsBtn = new Button { Content = "Settings", Height = 32, Margin = new Thickness(12, 0, 0, 0) };
+        var settingsBtn = new Button { Content = "Settings", Height = 32, Margin = new Thickness(12, 0, 0, 0), Background = Ui.WhiteBrush, Foreground = Ui.InkBrush, BorderBrush = Ui.BorderBrush, BorderThickness = new Thickness(1.5) };
         settingsBtn.Click += (_, _) => App.ShowSettings();
         _saveStatus = new TextBlock
         {

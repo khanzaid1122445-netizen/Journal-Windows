@@ -133,3 +133,25 @@ Known limitations / stubs in this test build:
 - No GitHub release was created and nothing was pushed to GitHub from
   this build, per the brief. No Notion token or database ID is in the
   source or the exe.
+
+## Fix 2 (2026-10-27) — theme consistency + Explorer file icon
+- Theme: App.Initialize now forces RequestedThemeVariant = ThemeVariant.Light,
+  regardless of Windows dark mode. Previously Fluent followed dark mode while
+  windows hard-coded light paper, so labels/buttons rendered white-on-paper
+  (invisible) and a focused TextBox went dark while its explicit foreground
+  stayed dark ink (black while typing).
+- Global light styles in App.Initialize cover every TextBlock, Button,
+  CheckBox and TextBox (ink foreground, white background, grey border,
+  teal-tint selection); local values (teal buttons, status colours) win.
+- Ui.TextBox now also sets SelectionBrush/SelectionForegroundBrush and
+  re-asserts white background + ink foreground + teal focus border on
+  GotFocus, grey border on LostFocus, so typing can never turn a box black.
+- Explicit ink foreground on all Settings labels, the Test Notion
+  connection button (white background, ink text, grey border), the update
+  checkbox, and the Capture "+" and "Settings" buttons.
+- Explorer icon: Journal.csproj now has <ApplicationIcon>icon.ico</ApplicationIcon>
+  (icon.ico kept as EmbeddedResource too, for window/tray). Previously the
+  exe file in Explorer had no J icon, only the window/tray did.
+- Notion logic unchanged: the reported 401 in the screenshot is expected
+  when the database ID field contains a placeholder like "sQQ" and the
+  token box is empty.
