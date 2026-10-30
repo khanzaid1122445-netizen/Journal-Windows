@@ -1,3 +1,9 @@
+## Version 1.0.4 — new logo + version bump (2026-10-30) — pending GitHub Actions release
+
+- Icon changed, user-approved 2026-10-30: green journal book logo with white J inside, replacing the old bold white J on teal square. icon.png (256) and icon.ico (16/32/48/256) regenerated from the approved preview.
+- Version bumped 1.0.3 to 1.0.4 in App.Version and Journal.csproj <Version>, together. No feature, shortcut, or Notion change in this version.
+- Release route: code plus tag v1.0.4 pushed to Journal-Windows; GitHub Actions "Velopack Windows" packs and uploads the Velopack release. User updates from Settings in the Velopack-installed app, not the single exe.
+
 ## Version 1.0.3 Velopack edition — Velopack-integrated 1.0.3 build only, NO Setup.exe yet (2026-10-30) — NOT published to GitHub, repo visibility left Public, existing public v1.0.3 single-exe release NOT deleted
 
 Output: publish-win-x64/Journal.exe — 92,695,460 bytes (~89 MB),
