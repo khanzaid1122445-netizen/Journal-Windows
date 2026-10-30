@@ -1,0 +1,53 @@
+name: Velopack Windows
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to pack, for example 1.0.4 (without the leading v)"
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  pack-and-upload:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Resolve version
+        id: version
+        shell: pwsh
+        run: |
+          if ("${{ github.event.inputs.version }}" -ne "") {
+            $ver = "${{ github.event.inputs.version }}"
+          } elseif ("${{ github.ref_type }}" -eq "tag") {
+            $ver = "${{ github.ref_name }}".TrimStart("v")
+          } else {
+            $ver = "1.0.3"
+          }
+          echo "version=$ver" >> $env:GITHUB_OUTPUT
+          echo "Packing version $ver"
+
+      - name: Install Velopack CLI
+        run: dotnet tool install -g vpk --version 0.0.942
+
+      - name: Publish Windows app
+        run: dotnet publish Journal.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish-win-x64
+
+      - name: Pack Velopack Setup
+        run: vpk pack --packId JournalQuickCapture --packVersion ${{ steps.version.outputs.version }} --packDir publish-win-x64 --mainExe Journal.exe --packTitle "Journal - Quick Capture" --packAuthors "Journal" --icon icon.ico --outputDir velopack-output
+
+      - name: Upload Velopack release to GitHub
+        run: vpk upload github --repoUrl https://github.com/khanzaid1122445-netizen/Journal-Windows --publish --releaseName "Journal ${{ steps.version.outputs.version }} Velopack" --token ${{ secrets.GITHUB_TOKEN }} velopack-output
