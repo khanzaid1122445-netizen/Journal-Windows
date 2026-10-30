@@ -50,4 +50,6 @@ jobs:
         run: vpk pack --packId JournalQuickCapture --packVersion ${{ steps.version.outputs.version }} --packDir publish-win-x64 --mainExe Journal.exe --packTitle "Journal - Quick Capture" --packAuthors "Journal" --icon icon.ico --outputDir velopack-output
 
       - name: Upload Velopack release to GitHub
-        run: vpk upload github --repoUrl https://github.com/khanzaid1122445-netizen/Journal-Windows --publish --releaseName "Journal ${{ steps.version.outputs.version }} Velopack" --token ${{ secrets.GITHUB_TOKEN }} velopack-output
+        run: |
+          cd velopack-output
+            vpk upload github --repoUrl https://github.com/khanzaid1122445-netizen/Journal-Windows --publish --releaseName "Journal ${{ steps.version.outputs.version }} Velopack" --tag v${{ steps.version.outputs.version }} --token ${{ secrets.GITHUB_TOKEN }}
