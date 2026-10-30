@@ -17,6 +17,10 @@ namespace Journal;
 
 public class App : Application
 {
+    /// <summary>Single version constant, shown in Settings. Must match
+    /// &lt;Version&gt; in Journal.csproj (currently 1.0.3).</summary>
+    public const string Version = "1.0.3";
+
     private static CaptureWindow? _capture;
     private static EveningWindow? _evening;
     private static MorningWindow? _morning;
@@ -200,7 +204,25 @@ public class App : Application
 
     private static async Task CheckUpdatesAsync()
     {
-        var (available, tag, url, notes) = await UpdateChecker.CheckAsync("1.0.0");
+        // Velopack first (installed app only, ask-first download and
+        // install, stable only). A plain single-file exe is not
+        // Velopack-installed (IsInstalled=false): fall through to
+        // the old GitHub latest-release check, which only opens the
+        // release page. Any other Velopack failure is also quiet:
+        // an update check must never break startup, especially
+        // while the feed is still private (see BUILD-NOTES.md).
+        var velopackSettings = Storage.LoadSettings();
+        if (VelopackUpdate.IsInstalled(velopackSettings))
+        {
+            try
+            {
+                await VelopackUpdate.CheckAndOfferAsync(velopackSettings);
+            }
+            catch { /* quiet: update check never breaks startup */ }
+            return;
+        }
+
+        var (available, tag, url, notes) = await UpdateChecker.CheckAsync(Version);
         if (!available || string.IsNullOrWhiteSpace(url)) return;
         var w = new Window
         {

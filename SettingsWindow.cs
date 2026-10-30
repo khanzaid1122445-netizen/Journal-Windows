@@ -14,6 +14,9 @@ public class SettingsWindow : Window
     private readonly TextBox _captureBox;
     private readonly TextBox _eveningBox;
     private readonly CheckBox _updatesBox;
+    private readonly CheckBox _downloadAskBox;
+    private readonly CheckBox _installAskBox;
+    private readonly TextBox _feedBox;
     private readonly TextBlock _status;
 
     public SettingsWindow()
@@ -27,6 +30,13 @@ public class SettingsWindow : Window
         {
             Text = "Settings", FontSize = 18, FontWeight = FontWeight.SemiBold,
             Foreground = new SolidColorBrush(Color.Parse("#1F2937"))
+        });
+        // Version line, clearly visible at the top of Settings.
+        // Single source: App.Version, which matches <Version> in Journal.csproj.
+        stack.Children.Add(new TextBlock
+        {
+            Text = "Version " + App.Version, FontSize = 14, FontWeight = FontWeight.SemiBold,
+            Foreground = new SolidColorBrush(Color.Parse("#0F766E"))
         });
         stack.Children.Add(new TextBlock { Text = "Notion — enter your own token and database ID. Nothing is hard-coded in the app.", FontSize = 12, TextWrapping = TextWrapping.Wrap, Foreground = Ui.InkBrush });
         stack.Children.Add(new TextBlock { Text = "Notion token (stored with Windows DPAPI, never in plain text)", Foreground = Ui.InkBrush });
@@ -46,8 +56,16 @@ public class SettingsWindow : Window
         _eveningBox = Ui.TextBox(40);
         _eveningBox.Text = s.EveningShortcut;
         stack.Children.Add(_eveningBox);
-        _updatesBox = new CheckBox { Content = "Check for updates on startup (GitHub Releases, stable only, ask first)", IsChecked = s.CheckForUpdates, Foreground = Ui.InkBrush };
+        _updatesBox = new CheckBox { Content = "Check for updates on startup (Velopack, stable only, ask first)", IsChecked = s.CheckForUpdates, Foreground = Ui.InkBrush };
         stack.Children.Add(_updatesBox);
+        stack.Children.Add(new TextBlock { Text = "Update feed — GitHub repo URL, or a public Velopack feed folder. Auto update only works once this feed is public; a private repo feed is ignored quietly.", FontSize = 12, TextWrapping = TextWrapping.Wrap, Foreground = Ui.InkBrush });
+        _feedBox = Ui.TextBox(40);
+        _feedBox.Text = s.UpdateFeedUrl;
+        stack.Children.Add(_feedBox);
+        _downloadAskBox = new CheckBox { Content = "Ask before downloading an update", IsChecked = s.UpdateDownloadAskFirst, Foreground = Ui.InkBrush };
+        stack.Children.Add(_downloadAskBox);
+        _installAskBox = new CheckBox { Content = "Ask before installing an update", IsChecked = s.UpdateInstallAskFirst, Foreground = Ui.InkBrush };
+        stack.Children.Add(_installAskBox);
         var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 12 };
         // Both buttons pin their own height and Top alignment so neither
         // stretches to fill the row (the reported "Save settings" sizing bug).
@@ -133,6 +151,9 @@ public class SettingsWindow : Window
         s.CaptureShortcut = capture;
         s.EveningShortcut = evening;
         s.CheckForUpdates = _updatesBox.IsChecked == true;
+        s.UpdateFeedUrl = (_feedBox.Text ?? "").Trim();
+        s.UpdateDownloadAskFirst = _downloadAskBox.IsChecked == true;
+        s.UpdateInstallAskFirst = _installAskBox.IsChecked == true;
         Storage.SaveSettings(s);
         // Re-register immediately on the existing hotkey window; no restart
         // is needed. A failed key is reported per shortcut, and the tray

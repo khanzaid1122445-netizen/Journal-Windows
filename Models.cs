@@ -40,6 +40,19 @@ public class AppSettings
     public string CaptureShortcut { get; set; } = "Ctrl+Alt+Q";
     public string EveningShortcut { get; set; } = "Ctrl+Alt+J";
     public bool CheckForUpdates { get; set; } = true;
+    // Velopack update feed. Default is the Journal-Windows GitHub repo.
+    // This is a public feed URL, never a secret. Auto update only works
+    // once this feed is public (see BUILD-NOTES.md); a private repo
+    // feed cannot be downloaded anonymously, so the check then fails
+    // quietly and the app continues normally. The user can change this
+    // in Settings to any public Velopack feed (GitHub repo URL, or a
+    // plain HTTP folder containing a Velopack RELEASES file).
+    public string UpdateFeedUrl { get; set; } = "https://github.com/khanzaid1122445-netizen/Journal-Windows";
+    // Ask-first gates, matching the Settings defaults: stable only is
+    // enforced in code (GithubSource prerelease=false), these two gate
+    // download and install separately. Neither is ever silent.
+    public bool UpdateDownloadAskFirst { get; set; } = true;
+    public bool UpdateInstallAskFirst { get; set; } = true;
     public bool HideToTray { get; set; } = true;
     // Last Notion test outcome: "" = never tested, "ok" = connected, "failed" = test failed.
     // The failure reason is shown to the user; it never contains a token.

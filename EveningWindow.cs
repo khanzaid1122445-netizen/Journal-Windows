@@ -94,7 +94,13 @@ public class EveningWindow : Window
         _sections = new Dictionary<string, List<string>>();
         foreach (var (tag, heading) in SectionMap)
         {
-            var lines = _today.Where(c => c.Tags.Contains(tag)).Select(c => c.Text).Where(t => !string.IsNullOrWhiteSpace(t)).ToList();
+            // Base tags go to their own section; a custom tag goes to its
+            // mapped section, and a capture still appears under every
+            // base tag it carries as well (no duplicates within a section).
+            var lines = _today.Where(c => c.Tags.Any(t =>
+                string.Equals(t, tag, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(TagStore.SectionFor(t), tag, StringComparison.OrdinalIgnoreCase)))
+                .Select(c => c.Text).Where(t => !string.IsNullOrWhiteSpace(t)).Distinct().ToList();
             _sections[heading] = lines;
         }
         var evenings = Storage.LoadEvening();
@@ -120,6 +126,27 @@ public class EveningWindow : Window
                 Text = lines.Count == 0 ? "Empty — stays empty" : string.Join("\n", lines.Select(l => "• " + l)),
                 FontSize = 13, TextWrapping = TextWrapping.Wrap
             });
+        }
+        // Custom tags with no section mapping yet: prompt here, do not
+        // lose the capture — it is listed here until a section is picked.
+        var unmapped = _today.SelectMany(c => c.Tags).Distinct(StringComparer.OrdinalIgnoreCase)
+            .Where(t => !TagStore.IsMapped(t)).ToList();
+        foreach (var tag in unmapped)
+        {
+            var capturedTag = tag;
+            _sectionsPanel.Children.Add(new TextBlock { Text = $"Tag “{tag}” has no section yet — pick one:", FontSize = 13, FontWeight = FontWeight.SemiBold });
+            var mapRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+            var combo = new ComboBox { Width = 180, Height = 36, ItemsSource = SectionMap.Select(s => s.Tag).ToList(), SelectedIndex = 0 };
+            var mapBtn = new Button { Content = "Save mapping", Height = 36 };
+            mapBtn.Click += (_, _) =>
+            {
+                TagStore.SetMapping(capturedTag, combo.SelectedItem as string ?? SectionMap[0].Tag);
+                Refresh();
+            };
+            mapRow.Children.Add(combo); mapRow.Children.Add(mapBtn);
+            _sectionsPanel.Children.Add(mapRow);
+            var lines = _today.Where(c => c.Tags.Contains(capturedTag, StringComparer.OrdinalIgnoreCase)).Select(c => c.Text).Where(t => !string.IsNullOrWhiteSpace(t)).ToList();
+            _sectionsPanel.Children.Add(new TextBlock { Text = string.Join("\n", lines.Select(l => "• " + l)), FontSize = 13, TextWrapping = TextWrapping.Wrap });
         }
         var untagged = _today.Where(c => c.Tags.Count == 0).Select(c => c.Text).Where(t => !string.IsNullOrWhiteSpace(t)).ToList();
         if (untagged.Count > 0)

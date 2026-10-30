@@ -13,6 +13,15 @@ public static class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        // Velopack install/update hooks, as early as possible.
+        // SetAutoApplyOnStartup(false) is deliberate: a downloaded
+        // update must NOT be installed silently on the next launch.
+        // Installation only happens after the explicit install prompt
+        // in VelopackUpdate.CheckAndOfferAsync. For a plain single-file
+        // exe this is a no-op; failure here must never stop the app.
+        try { Velopack.VelopackApp.Build().SetAutoApplyOnStartup(false).Run(); }
+        catch { /* not a Velopack install, or hooks unavailable: continue normally */ }
+
         // Single-instance guard: a second launched copy must NOT steal or
         // fail the first copy's global hotkeys (the reported "shortcut
         // could not be registered" when Journal.exe was already running).
