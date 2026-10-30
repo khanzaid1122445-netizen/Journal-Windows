@@ -47,9 +47,7 @@ jobs:
         run: dotnet publish Journal.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish-win-x64
 
       - name: Pack Velopack Setup
-        run: vpk pack --packId JournalQuickCapture --packVersion ${{ steps.version.outputs.version }} --packDir publish-win-x64 --mainExe Journal.exe --packTitle "Journal - Quick Capture" --packAuthors "Journal" --icon icon.ico --outputDir velopack-output
+        run: vpk pack --packId JournalQuickCapture --packVersion ${{ steps.version.outputs.version }} --packDir publish-win-x64 --mainExe Journal.exe --packTitle "Journal - Quick Capture" --packAuthors "Journal" --icon icon.ico --outputDir Releases
 
       - name: Upload Velopack release to GitHub
-        run: |
-          cd velopack-output
-            vpk upload github --repoUrl https://github.com/khanzaid1122445-netizen/Journal-Windows --publish --releaseName "Journal ${{ steps.version.outputs.version }} Velopack" --tag v${{ steps.version.outputs.version }} --token ${{ secrets.GITHUB_TOKEN }}
+        run:             vpk upload github --repoUrl https://github.com/khanzaid1122445-netizen/Journal-Windows --publish --releaseName "Journal ${{ steps.version.outputs.version }} Velopack" --tag v${{ steps.version.outputs.version }} --token ${{ secrets.GITHUB_TOKEN }}
