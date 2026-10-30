@@ -1,3 +1,10 @@
+## Version 1.0.5 — version bump only, to avoid existing 1.0.4 release conflict (2026-10-30)
+
+- Same features as 1.0.4: green journal book logo with white J, Check for updates button in Settings.
+- Version bumped 1.0.4 to 1.0.5 in App.Version and Journal.csproj <Version>, together. No feature change.
+- Reason: vpk upload for 1.0.4 failed with "There is already an existing release tagged 'v1.0.4'" because an empty 1.0.4 release was pre-created when the tag was first published. That release is NOT deleted. Instead 1.0.5 is released as a new release.
+- Release route for 1.0.5: do NOT pre-create a release shell first, or vpk upload will fail the same way. Run the Velopack Windows workflow via workflow_dispatch with version 1.0.5, so vpk upload --publish creates the 1.0.5 release itself.
+
 ## Version 1.0.4 — new logo + version bump (2026-10-30) — pending GitHub Actions release
 
 - Icon changed, user-approved 2026-10-30: green journal book logo with white J inside, replacing the old bold white J on teal square. icon.png (256) and icon.ico (16/32/48/256) regenerated from the approved preview.

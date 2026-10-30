@@ -18,8 +18,8 @@ namespace Journal;
 public class App : Application
 {
     /// <summary>Single version constant, shown in Settings. Must match
-    /// &lt;Version&gt; in Journal.csproj (currently 1.0.4).</summary>
-    public const string Version = "1.0.4";
+    /// &lt;Version&gt; in Journal.csproj (currently 1.0.5).</summary>
+    public const string Version = "1.0.5";
 
     private static CaptureWindow? _capture;
     private static EveningWindow? _evening;
