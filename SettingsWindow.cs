@@ -66,6 +66,14 @@ public class SettingsWindow : Window
         stack.Children.Add(_downloadAskBox);
         _installAskBox = new CheckBox { Content = "Ask before installing an update", IsChecked = s.UpdateInstallAskFirst, Foreground = Ui.InkBrush };
         stack.Children.Add(_installAskBox);
+        var checkUpdates = new Button
+        {
+            Content = "Check for updates", Width = 200, Height = 44, VerticalAlignment = VerticalAlignment.Top,
+            Background = new SolidColorBrush(Color.Parse("#0F766E")),
+            Foreground = new SolidColorBrush(Color.Parse("#FFFFFF"))
+        };
+        checkUpdates.Click += async (_, _) => await CheckUpdatesAsync();
+        stack.Children.Add(checkUpdates);
         var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 12 };
         // Both buttons pin their own height and Top alignment so neither
         // stretches to fill the row (the reported "Save settings" sizing bug).
@@ -87,6 +95,21 @@ public class SettingsWindow : Window
         stack.Children.Add(_status);
         Content = new ScrollViewer { Content = stack };
         Closing += (_, e) => { e.Cancel = true; Hide(); };
+    }
+
+    private async Task CheckUpdatesAsync()
+    {
+        // Save only the update fields first, so the check uses the
+        // feed and ask-first choices shown here, without forcing a
+        // shortcut or token save at the same time.
+        var s = Storage.LoadSettings();
+        s.CheckForUpdates = _updatesBox.IsChecked == true;
+        s.UpdateFeedUrl = (_feedBox.Text ?? "").Trim();
+        s.UpdateDownloadAskFirst = _downloadAskBox.IsChecked == true;
+        s.UpdateInstallAskFirst = _installAskBox.IsChecked == true;
+        Storage.SaveSettings(s);
+        _status.Text = "Checking for updates…";
+        _status.Text = await App.CheckUpdatesAsync();
     }
 
     private async Task TestAsync()

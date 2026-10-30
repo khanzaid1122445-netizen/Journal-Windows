@@ -202,7 +202,7 @@ public class App : Application
         thread.Start();
     }
 
-    private static async Task CheckUpdatesAsync()
+    public static async Task<string> CheckUpdatesAsync()
     {
         // Velopack first (installed app only, ask-first download and
         // install, stable only). A plain single-file exe is not
@@ -216,14 +216,14 @@ public class App : Application
         {
             try
             {
-                await VelopackUpdate.CheckAndOfferAsync(velopackSettings);
+                var applied = await VelopackUpdate.CheckAndOfferAsync(velopackSettings);
+                return applied ? "Update installed, restarting…" : "No update found.";
             }
-            catch { /* quiet: update check never breaks startup */ }
-            return;
+            catch { /* quiet: update check never breaks startup */ return "Update check failed."; }
         }
 
         var (available, tag, url, notes) = await UpdateChecker.CheckAsync(Version);
-        if (!available || string.IsNullOrWhiteSpace(url)) return;
+        if (!available || string.IsNullOrWhiteSpace(url)) return "You are up to date.";
         var w = new Window
         {
             Title = "Update available", Width = 480, Height = 320,
@@ -248,5 +248,6 @@ public class App : Application
         stack.Children.Add(open); stack.Children.Add(later);
         w.Content = stack;
         w.Show();
+        return "Update available: " + tag;
     }
 }
